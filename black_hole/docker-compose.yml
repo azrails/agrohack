@@ -1,0 +1,23 @@
+version: '3.3'
+
+services:
+  agregator_db:
+    container_name: agregator_db
+    image: postgres:10.1-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - /home/azrail/agrohack/black_hole/agregator_data/__data:/var/lib/postgresql/data
+  black_hole:
+    container_name: black_hole
+    build: .
+    command: bash -c "python /usr/src/black_hole/manage.py makemigrations --noinput &&
+             python /usr/src/black_hole/manage.py migrate --noinput &&
+             python /usr/src/black_hole/manage.py runserver 0.0.0.0:8000"
+
+    volumes:
+      - .:/usr/src/black_hole
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
